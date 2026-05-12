@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Cloud Browser</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+  <header id="topbar">
+    <div id="nav-controls">
+      <button class="nav-btn" id="btn-back" title="Back" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button class="nav-btn" id="btn-forward" title="Forward" aria-label="Forward">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      <button class="nav-btn" id="btn-reload" title="Reload" aria-label="Reload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="url-bar-wrap">
+      <div id="url-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <input id="url-input" type="url" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search or enter URL…">
+      <button id="btn-go" aria-label="Go">Go</button>
+    </div>
+
+    <div id="header-actions">
+      <button class="nav-btn" id="btn-keyboard" title="Keyboard" aria-label="Open keyboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/>
+          <line x1="6" y1="10" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/>
+          <line x1="14" y1="10" x2="14" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/>
+          <line x1="6" y1="14" x2="6" y2="14"/><line x1="18" y1="14" x2="18" y2="14"/>
+          <line x1="10" y1="14" x2="14" y2="14"/>
+        </svg>
+      </button>
+      <button class="nav-btn" id="btn-settings" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Canvas viewport ───────────────────────────────────────────────────── -->
+  <main id="viewport">
+    <canvas id="screen"></canvas>
+    <div id="status-overlay">
+      <div id="status-spinner"></div>
+      <div id="status-text">Connecting…</div>
+    </div>
+    <div id="fps-badge"></div>
+  </main>
+
+  <!-- ── Keyboard input bridge ─────────────────────────────────────────────── -->
+  <div id="keyboard-bridge" class="hidden">
+    <div id="keyboard-bridge-inner">
+      <label>Type below — text goes to remote browser</label>
+      <div id="keyboard-input-row">
+        <textarea id="remote-text-input" rows="2" placeholder="Type here…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        <button id="btn-send-text">Send</button>
+      </div>
+      <div id="keyboard-shortcuts">
+        <button class="key-shortcut" data-key="Enter">↵ Enter</button>
+        <button class="key-shortcut" data-key="Backspace">⌫ Del</button>
+        <button class="key-shortcut" data-key="Tab">Tab</button>
+        <button class="key-shortcut" data-key="Escape">Esc</button>
+      </div>
+      <button id="btn-close-keyboard">Close</button>
+    </div>
+  </div>
+
+  <!-- ── Settings panel ────────────────────────────────────────────────────── -->
+  <div id="settings-panel" class="hidden">
+    <div id="settings-inner">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button id="btn-close-settings" aria-label="Close settings">✕</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>Browser Mode</h3>
+        <div class="btn-group" id="mode-group">
+          <button class="mode-btn active" data-mode="mobile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+            Mobile
+          </button>
+          <button class="mode-btn" data-mode="tablet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+            Tablet
+          </button>
+          <button class="mode-btn" data-mode="desktop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            Desktop
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Stream Quality</h3>
+        <div class="btn-group" id="quality-group">
+          <button class="quality-btn" data-quality="320">
+            <span class="q-label">320p</span>
+            <span class="q-sub">Data saver</span>
+          </button>
+          <button class="quality-btn active" data-quality="480">
+            <span class="q-label">480p</span>
+            <span class="q-sub">Balanced</span>
+          </button>
+          <button class="quality-btn" data-quality="720">
+            <span class="q-label">720p</span>
+            <span class="q-sub">HD</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Session</h3>
+        <div class="settings-actions">
+          <button id="btn-reset" class="action-btn danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-3.79"/>
+            </svg>
+            Reset Browser
+          </button>
+          <button id="btn-downloads" class="action-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Downloads
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Downloads panel ────────────────────────────────────────────────────── -->
+  <div id="downloads-panel" class="hidden">
+    <div id="downloads-inner">
+      <div class="settings-header">
+        <h2>Downloads</h2>
+        <button id="btn-close-downloads" aria-label="Close downloads">✕</button>
+      </div>
+      <div id="downloads-list">
+        <div class="empty-state">No downloads yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Scrim ─────────────────────────────────────────────────────────────── -->
+  <div id="scrim" class="hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
